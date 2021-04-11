@@ -1,8 +1,8 @@
 cmake_minimum_required (VERSION 2.6)
 find_package(Git QUIET)
-project (elevator-sim CXX)
+project (kitser CXX)
 
-set(BUILD_HEADER_FILES_DIRECTORY "${PROJECT_SOURCE_DIR}/build/include/Elevator")
+set(BUILD_HEADER_FILES_DIRECTORY "${PROJECT_SOURCE_DIR}/build/include/kitser")
 set(BUILD_LIB_FILES_DIRECTORY "${PROJECT_SOURCE_DIR}/build/lib")
 
 #SET C++ 11
@@ -17,7 +17,7 @@ else()
 endif()
 
 #UNCOMMENT FOR DEBUG MODE
-add_definitions(-g)
+#add_definitions(-g)
 
 #GIT SUBMODULE INIT
 if(GIT_FOUND AND EXISTS ".git")
@@ -33,11 +33,32 @@ endif()
 
 #BUILDING LIBRARY
 
+file(GLOB KITSER "${PROJECT_SOURCE_DIR}/kitser/*.cpp")
+
+file(GLOB ALL_HEADER_FILES "${PROJECT_SOURCE_DIR}/kitser/*.hpp")
+
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY  ${BUILD_LIB_FILES_DIRECTORY})
+
+include_directories("${PROJECT_SOURCE_DIR}/spdlog/include")
+
+add_library(kitser SHARED ${KITSER})
+
+file(COPY ${ALL_HEADER_FILES} DESTINATION ${BUILD_HEADER_FILES_DIRECTORY})
+
 #LIBRARY BUILD COMPLETE
 
 
 
 #BUILDING EXECUTABLE FOR SIMULATION
 
+include_directories("${PROJECT_SOURCE_DIR}/build/include")
+include_directories("${PROJECT_SOURCE_DIR}/spdlog/include")
+
+link_directories("${PROJECT_SOURCE_DIR}/build/lib")
+link_directories("/usr/lib64")
+
+add_executable(simulation src/simulator.cpp)
+
+target_link_libraries(simulation kitser)
 
 #EXECUTABLE BUILDING COMPLETE
